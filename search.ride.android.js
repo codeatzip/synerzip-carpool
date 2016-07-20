@@ -20,9 +20,17 @@ import {Actions} from 'react-native-router-flux';
 
 
 class SearchRideView extends Component {
+
+  constructor(){
+        super()
+        this.confirmRide = this.confirmRide.bind(this)
+        this.showAlert = this.showAlert.bind(this)
+        this.emptyFunction = this.emptyFunction.bind(this)
+    }
+
   componentDidMount() {
     this.androidBackHandler = this.onBackPressed.bind(this);
-    BackAndroid.addEventListener('hardwareBackPress', this.androidBackHandler);
+    BackAndroid.addEventListener('hardwareBackPress', this.onBackPressed);
   }
 
   /*
@@ -46,9 +54,9 @@ class SearchRideView extends Component {
           Drivers in your route
         </Text>
 <View style ={styles.sameline}>
-        <Text style={{marginTop: 20, color: '#ffffff'}}>Jitesh Lalwani</Text>
+        <Text style={{marginTop: 20, color: '#ffffff'}}>Ashutosh Kumar</Text>
          <TouchableNativeFeedback
-        onPress={this.requestRide.bind(this,'Jitesh Lalwani')}
+        onPress={this.requestRide.bind(this,'Ashutosh Kumar')}
         background={TouchableNativeFeedback.SelectableBackground()}>
       <View style={{margin: 10, width:100, backgroundColor: '#1769ff'}}>
         <Text style={{margin: 10, textAlign: 'center', color: '#ffffff'}}>Request ride</Text>
@@ -71,16 +79,34 @@ class SearchRideView extends Component {
   }
 
    requestRide(name){
-
-    Alert.alert(
-            'Confirmation',
-            'Are you sure you want to request a ride with ' +name + '?',
-            [
-              {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-              {text: 'OK', onPress: () => console.log('OK Pressed!')},
-            ]
-          )
+       this.showAlert('','Are you sure you want to request a ride with ' +name + '?', true, this.confirmRide, this.emptyFunction)
   }
+
+    showAlert(title, message, cancelRequired, okFunctionName, cancelFunctionName){
+        let options = []
+        if(cancelRequired){
+            options = [
+                {text: 'OK', onPress: () => okFunctionName()},
+                {text: 'Cancel', onPress: () => cancelFunctionName()}
+            ]
+        }else {
+            options = [
+                {text: 'OK', onPress: () => okFunctionName()},
+            ]
+        }
+        Alert.alert(
+            title,
+            message,
+            options)
+    }
+
+    confirmRide(){
+        this.showAlert('','Request sent successfully', false, this.emptyFunction, this.emptyFunction)
+    }
+
+    emptyFunction(){
+
+    }
 
   }
 

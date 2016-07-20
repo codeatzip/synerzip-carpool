@@ -23,7 +23,11 @@ class LoginView extends Component {
       username:'',
       password:''
     }
+    this.validateFields = this.validateFields.bind(this)
+    this.validateSynerzipDomain = this.validateSynerzipDomain.bind(this)
+    this.showAlert = this.showAlert.bind(this)
   }
+
   render() {
     return (
       <View style={styles.container}> 
@@ -34,13 +38,15 @@ class LoginView extends Component {
           To get started, Please sign-in with your Synerzip mail id
         </Text>
         
-       <TextInput style={styles.textinput} onChange={this.handleUserNameChange.bind(this)}
-        value={this.state.username}  placeholder="Username"/>
-       <TextInput style={styles.textinput} onChange={this.handlePasswordChange.bind(this)} 
-       value={this.state.password}  secureTextEntry={true} placeholder="Password"/>
+       <TextInput ref= "username" style={styles.textinput} onChangeText={(username) => this.setState({username})}
+                  value={this.state.username}
+        placeholder="Username"/>
+       <TextInput  ref= "password" style={styles.textinput} onChangeText={(password) => this.setState({password})}
+                   value={this.state.password}
+                   secureTextEntry={true} placeholder="Password"/>
        <Text style={{fontSize:11, marginLeft:200, color: '#ffffff'}}>Forgot password?</Text>
         <TouchableNativeFeedback
-        onPress={this.onPressButton}
+        onPress={this.onPressButton.bind(this)}
         background={TouchableNativeFeedback.SelectableBackground()}>
       <View style={{margin: 10, width:100, backgroundColor: '#1769ff'}}>
         <Text style={{margin: 10, textAlign: 'center', color: '#ffffff'}}>Login</Text>
@@ -50,57 +56,55 @@ class LoginView extends Component {
     );
   }
 
-  handleUserNameChange(e){
-    this.setState({
-      username:e.target.value
-    })
-  }
-
-  handlePasswordChange(e){
-    this.setState({
-      password:e.target.value
-    })
-  }
 
   onPressButton(){
-    if(this.validateEmail){
-      if(this.validateSynerzipDomain){
-        Actions.showHomeView()
-      }else{
-        this.showAlert('Please login with Synerzip mail id only')
-        }
+    let validateFieldsResult = this.validateFields()
+    if(validateFieldsResult.result){
+      Actions.showHomeView()
     }else {
-      this.showAlert('Your email id is incorrect')
+      this.showAlert(validateFieldsResult.title, validateFieldsResult.message)
     }
   }
 
-  showAlert(message){
-     Alert.alert(
-            'Email incorrect',
-            message,
-            [
-              {text: 'OK', onPress: () => console.log('OK Pressed!')}
-            ])
-  }
+  validateFields(){
+    let email = this.state.username.toLowerCase();
+    let password = this.state.password
+    if(email.length>0 && password.length>0) {
+      var re = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+      if (re.test(email)) {
+        if (email.indexOf('@synerzip.com', email.length - '@synerzip.com'.length) !== -1) {
+          return {"result": true}
+        } else {
+          return {"result": false, title:'', 'message': 'Email must be a synerzip e-mail address (your.name@synerzip.com).'}
+        }
+      } else {
+        return {"result": false, title:'', 'message': 'Not a valid e-mail address.'}
 
-  validateEmail(){
-    var x = this.state.username
-    var atpos = x.indexOf("@");
-     var dotpos = x.lastIndexOf(".");
-    if (atpos<1 || dotpos<atpos+2 || dotpos+2>=x.length) {
-        alert("Not a valid e-mail address");
-        return false;
+      }
+    }
+    else {
+      return {"result": false, title:'', 'message': 'Email and password are required to continue'}
     }
   }
 
   validateSynerzipDomain(){
-    var idx = this.state.username.lastIndexOf('@');
-    if (idx > -1 && emailAddress.slice(idx) === 'synerzip.com') {
+    let username = this.state.username
+    var idx = username.lastIndexOf('@');
+    if (idx > -1 && username.slice(idx) === 'synerzip.com') {
       return true
-    }else{
+    } else {
     return false
     }
 }
+
+  showAlert(title, message){
+    Alert.alert(
+        title,
+        message,
+        [
+          {text: 'OK', onPress: () => console.log('OK Pressed')}
+        ])
+  }
 
 }
 

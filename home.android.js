@@ -24,7 +24,7 @@ class HomeView extends Component {
 
   componentDidMount() {
     this.androidBackHandler = this.onBackPressed.bind(this);
-    BackAndroid.addEventListener('hardwareBackPress', this.androidBackHandler);
+    BackAndroid.addEventListener('hardwareBackPress', this.onBackPressed);
   }
 
   /*
@@ -52,7 +52,10 @@ class HomeView extends Component {
       longitudeDelta: 0.0421,
     }}
   />
- 
+        <Text style={styles.instructions}>
+          Welcome Jitesh Lalwani
+        </Text>
+
         <TouchableNativeFeedback
         onPress={this.createRideButton}
         background={TouchableNativeFeedback.SelectableBackground()}>

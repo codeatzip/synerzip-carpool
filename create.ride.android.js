@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   BackAndroid,
+  Alert,
   TouchableNativeFeedback,
   View
 } from 'react-native';
@@ -19,16 +20,24 @@ import {Actions} from 'react-native-router-flux';
 
 class CreateRideView extends Component {
 
+  constructor() {
+    super()
+    this.createRide = this.createRide.bind(this)
+    this.confirmRide = this.confirmRide.bind(this)
+    this.showAlert = this.showAlert.bind(this)
+    this.emptyFunction = this.emptyFunction.bind(this)
+  }
+
   componentDidMount() {
     this.androidBackHandler = this.onBackPressed.bind(this);
-    BackAndroid.addEventListener('hardwareBackPress', this.androidBackHandler);
+    BackAndroid.addEventListener('hardwareBackPress', this.onBackPressed);
   }
 
   /*
   Pops out the current active component
   */
   onBackPressed() {
-    {Actions.pop()}
+    Actions.pop()
     return true;
   }
 
@@ -50,7 +59,7 @@ class CreateRideView extends Component {
        <TextInput style={styles.textinput} placeholder="Destination"/>
        <TextInput style={styles.textinput}  placeholder="Start time"/>
         <TouchableNativeFeedback
-        // onPress={this._onPressButton}
+        onPress={this.createRide}
         background={TouchableNativeFeedback.SelectableBackground()}>
       <View style={{margin: 10, width:100, backgroundColor: '#1769ff'}}>
         <Text style={{margin: 10, textAlign: 'center', color: '#ffffff'}}>Create ride</Text>
@@ -58,6 +67,36 @@ class CreateRideView extends Component {
     </TouchableNativeFeedback>
    </View>
     );
+  }
+
+  createRide(){
+    this.showAlert('','Please confirm that you want to create a ride', true, this.confirmRide, this.emptyFunction)
+  }
+
+  showAlert(title, message, cancelRequired, okFunctionName, cancelFunctionName){
+    let options = []
+    if(cancelRequired){
+      options = [
+            {text: 'OK', onPress: () => okFunctionName()},
+            {text: 'Cancel', onPress: () => cancelFunctionName()}
+          ]
+    }else {
+      options = [
+            {text: 'OK', onPress: () => okFunctionName()},
+          ]
+    }
+    Alert.alert(
+        title,
+        message,
+        options)
+  }
+
+  confirmRide(){
+    this.showAlert('','Ride created successfully', false, this.emptyFunction, this.emptyFunction)
+  }
+
+  emptyFunction(){
+
   }
 
 }
